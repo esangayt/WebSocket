@@ -5,10 +5,26 @@ from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 from chat.models import ChatMessage
+import socket
+import netifaces
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
+        # Obtener el nombre del host
+        hostname = socket.gethostname()
+
+        # Obtener la dirección IP utilizando el nombre del host
+        ip_address = socket.gethostbyname(hostname)
+
+        # Obtener la dirección IP de la interfaz de red
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            # Esto no envía un paquete real
+            s.connect(("8.8.8.8", 80))
+            ip_local = s.getsockname()[0]
+        finally:
+            s.close()
 
         # chech user authentication
         if self.scope["user"].is_anonymous:
